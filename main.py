@@ -35,6 +35,17 @@ def main() -> int:
         out_path = os.path.join(out_dir, "entry.png")
         with open(out_path, "wb") as f:
             f.write(data)
+        # Read back and verify the written copy is byte-identical to the
+        # source, so a truncated or failed write is caught here, not later.
+        with open(out_path, "rb") as f:
+            written = f.read()
+        if written != data:
+            print(
+                f"output mismatch: wrote {len(written)} bytes, "
+                f"expected {len(data)}",
+                file=sys.stderr,
+            )
+            return 1
     except OSError as exc:
         print(f"cannot write output: {exc}", file=sys.stderr)
         return 1
